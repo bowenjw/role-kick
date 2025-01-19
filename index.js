@@ -1,5 +1,9 @@
 import { Client, Events, GatewayIntentBits, PermissionFlagsBits } from 'discord.js';
 
+// Check is kickRoleId is undefined
+const kickRoleId = process.env.KICK_ROLE_ID;
+if (kickRoleId == undefined) {throw Error('env.KICK_ROLE_ID is undefined');}
+
 // Create Client
 const client = new Client({
     intents: [GatewayIntentBits.Guilds],
@@ -11,10 +15,6 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
-
-    // Check is kickRoleId is undefined
-    const kickRoleId = process.env.KICK_ROLE_ID;
-    if (kickRoleId == undefined) {throw Error('env.KICK_ROLE_ID is undefined');}
 
     // Check is kickRole is in guild or undefined
     const kickRole = oldMember.guild.roles.cache.get(kickRoleId) ?? await oldMember.guild.roles.fetch(kickRoleId);
