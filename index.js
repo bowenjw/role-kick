@@ -6,7 +6,10 @@ if (kickRoleId == undefined) {throw Error('env.KICK_ROLE_ID is undefined');}
 
 // Create Client
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
+    ],
 });
 
 // Event triggers when bot is ready
