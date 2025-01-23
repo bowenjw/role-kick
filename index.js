@@ -1,8 +1,11 @@
-import { Client, Events, GatewayIntentBits, PermissionFlagsBits } from 'discord.js';
+import { Client, Events, GatewayIntentBits } from 'discord.js';
 
 // Check is kickRoleId is undefined
-const kickRoleId = process.env.KICK_ROLE_ID;
-if (kickRoleId == undefined) {throw Error('env.KICK_ROLE_ID is undefined');}
+
+if (process.env.KICK_ROLE_ID == undefined) {throw Error('env.KICK_ROLE_ID is undefined');}
+
+const kickRoleId = process.env.KICK_ROLE_ID.includes(' ') ? process.env.KICK_ROLE_ID.split(' ') : process.env.KICK_ROLE_ID;
+
 
 // Create Client
 const client = new Client({
@@ -19,16 +22,11 @@ client.once(Events.ClientReady, readyClient => {
 
 client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
 
-    // Check is kickRole is in guild or undefined
-    const kickRole = oldMember.guild.roles.cache.get(kickRoleId) ?? await oldMember.guild.roles.fetch(kickRoleId);
-    if (kickRole == undefined) {throw Error('kickRole does not exist in server');}
-
+    const kickrole = newMember.roles.cache.find((_role, key) => {
+        return kickRoleId === key || kickRoleId.includes(key);
+    });
     // Kick member if the kick role was added and user is not have manage role perm or admin
-    else if (
-        newMember.permissions.has(PermissionFlagsBits.ManageRoles, true)
-            && newMember.roles.cache.has(kickRole.id) == true) {
-        void newMember.kick(`User selected ${kickRole.name}`);
-    }
+    if (kickrole !== undefined) {void newMember.kick(`User selected ${kickRole.name}`);}
 });
 
 client.login(process.env.DISCORD_TOKEN);
